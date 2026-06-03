@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEDICLOUD — Clinic Care Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --surface2: #f1f3f5;
+      --border: #e9ecef;
+      --ink: #1a1d20;
+      --ink2: #495057;
+      --ink3: #adb5bd;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent2: #ecfdf5;
+      --red: #ef4444;
+      --red2: #fef2f2;
+      --amber: #f59e0b;
+      --amber2: #fffbeb;
+      --blue: #3b82f6;
+      --blue2: #eff6ff;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow: 0 4px 18px -4px rgba(26,29,32,0.04), 0 2px 6px -2px rgba(26,29,32,0.02);
+      --shadow-lg: 0 12px 30px -4px rgba(26,29,32,0.08), 0 4px 12px -2px rgba(26,29,32,0.03);
+      --sidebar-width: 250px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* LOGIN */
+    #login-screen { flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at top right, #e6f7f2, var(--bg) 60%); position: relative; overflow: hidden; padding: 20px; }
+    .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px 24px; width: 100%; max-width: 440px; box-shadow: var(--shadow-lg); position: relative; z-index: 1; animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .login-logo .icon { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 22px; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
+    .login-logo h1 { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.8rem; letter-spacing: -0.5px; }
+    .login-tagline { color: var(--ink2); font-size: 0.9rem; margin-bottom: 32px; line-height: 1.6; font-weight: 400; }
+    .login-roles { display: flex; gap: 8px; margin-bottom: 28px; }
+    .role-chip { flex: 1; padding: 10px 4px; border: 1.5px solid var(--border); border-radius: 12px; background: var(--surface); text-align: center; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--ink2); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); user-select: none; }
+    .role-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+    .role-chip.active { border-color: var(--accent); background: var(--accent2); color: var(--accent); box-shadow: 0 4px 12px rgba(16,185,129,0.08); }
+    .role-chip .emoji { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--ink2); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .form-group input { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface); font-family: inherit; font-size: 0.95rem; color: var(--ink); outline: none; transition: all 0.2s; }
+    .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(16,185,129,0.1); }
+    .btn-primary { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(16,185,129,0.2); }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,0.25); }
+    .login-footer { text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--ink3); display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+    .login-footer a { color: var(--accent); text-decoration: none; font-weight: 600; cursor: pointer; }
+
+    /* APP SHELL */
+    #app-screen { flex-direction: row; position: relative; }
+    .sidebar { width: var(--sidebar-width); min-width: var(--sidebar-width); background: #111417; color: #fff; display: flex; flex-direction: column; padding: 0; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .sidebar-top { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.3rem; }
+    .sidebar-logo .icon { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .sidebar-user { margin-top: 20px; display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; }
+    .sidebar-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }
+    .sidebar-user-name { font-size: 0.88rem; font-weight: 600; }
+    .sidebar-role-badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); margin-top: 3px; display: inline-block; font-weight: 500; }
+    .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+    .nav-section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); padding: 12px 12px 6px; font-weight: 700; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; color: rgba(255,255,255,0.6); transition: all 0.2s; margin-bottom: 2px; font-weight: 500; }
+    .nav-item .nav-icon { font-size: 1.05rem; width: 20px; text-align: center; flex-shrink: 0; opacity: 0.8; }
+    .nav-item:hover { background: rgba(255,255,255,0.04); color: #fff; }
+    .nav-item.active { background: var(--accent); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(16,185,129,0.15); }
+    .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+    .logout-btn { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; color: rgba(255,255,255,0.4); transition: all 0.2s; font-weight: 500; }
+    .logout-btn:hover { background: rgba(239,68,68,0.08); color: #f87171; }
+    
+    .sidebar-close-btn { display: none; position: absolute; right: 16px; top: 24px; background: transparent; border: none; color: rgba(255,255,255,0.4); font-size: 1.4rem; cursor: pointer; }
+
+    /* COLLAPSIBLE SIDEBAR STATES */
+    .main-content { margin-left: var(--sidebar-width); flex: 1; min-height: 100vh; background: var(--bg); transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative; width: calc(100% - var(--sidebar-width)); }
+    
+    body.sidebar-hidden .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
+    body.sidebar-hidden .main-content { margin-left: 0; width: 100%; }
+    
+    /* SIDEBAR TOGGLE BUTTON */
+    .sidebar-toggle { position: absolute; top: 24px; left: 24px; z-index: 90; width: 38px; height: 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow); transition: all 0.2s; font-size: 1.1rem; }
+    .sidebar-toggle:hover { background: var(--surface2); border-color: var(--ink3); }
+    
+    .page { display: none; padding: 84px 24px 48px; animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; max-width: 1300px; margin: 0 auto; width: 100%; }
+    .page.active { display: block; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+    .page-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.8rem; letter-spacing: -0.5px; }
+    .page-subtitle { color: var(--ink2); font-size: 0.92rem; margin-top: 4px; font-weight: 400; }
+
+    /* STAT CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+    .stat-card .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink3); margin-bottom: 10px; font-weight: 700; }
+    .stat-card .stat-value { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 2.2rem; line-height: 1; margin-bottom: 6px; }
+    .stat-card .stat-sub { font-size: 0.8rem; color: var(--ink2); font-weight: 500; }
+    .stat-card .stat-icon { font-size: 1.5rem; margin-bottom: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: var(--surface2); }
+    .stat-card.green { border-top: 4px solid var(--accent); }
+    .stat-card.red   { border-top: 4px solid var(--red); }
+    .stat-card.amber { border-top: 4px solid var(--amber); }
+    .stat-card.blue  { border-top: 4px solid var(--blue); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 20px; width: 100%; overflow: hidden; }
+    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; color: var(--ink); letter-spacing: -0.2px; gap: 10px; }
+    .card-title span { color: var(--accent); font-size: 0.85rem; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: background 0.2s; flex-shrink: 0; }
+    .card-title span:hover { background: var(--accent2); }
+
+    /* SEARCH BAR */
+    .search-bar { display: flex; gap: 10px; margin-bottom: 16px; width: 100%; }
+    .search-bar input { flex: 1; padding: 11px 16px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); font-family: inherit; font-size: 0.9rem; color: var(--ink); outline: none; transition: all 0.2s; min-width: 0; }
+    .search-bar input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(16,185,129,0.06); }
+    .search-bar button { padding: 11px 20px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .search-bar button:hover { background: var(--accent-hover); }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; margin-left: -24px; margin-right: -24px; width: calc(100% + 48px); -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; min-width: 600px; }
+    thead th { padding: 12px 24px; border-bottom: 2px solid var(--border); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink3); font-weight: 700; background: #fafafa; }
+    tbody td { padding: 14px 24px; border-bottom: 1px solid var(--border); color: var(--ink); font-weight: 500; vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #fdfdfd; }
+
+    /* BADGES */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+    .badge.green  { background: var(--accent2); color: var(--accent); }
+    .badge.red    { background: var(--red2);    color: var(--red); }
+    .badge.amber  { background: var(--amber2);  color: var(--amber); }
+    .badge.blue   { background: var(--blue2);   color: var(--blue); }
+    .badge.gray   { background: var(--surface2); color: var(--ink2); }
+
+    /* SCHEDULE */
+    .schedule-list { display: flex; flex-direction: column; gap: 10px; }
+    .schedule-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); transition: all 0.2s; }
+    .schedule-item:hover { box-shadow: var(--shadow); border-color: var(--ink3); }
+    .schedule-time { font-size: 0.8rem; font-weight: 700; color: var(--accent); min-width: 70px; }
+    .schedule-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    .schedule-dot.red    { background: var(--red); }
+    .schedule-dot.amber  { background: var(--amber); }
+    .schedule-info { flex: 1; min-width: 0; }
+    .schedule-name { font-size: 0.92rem; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .schedule-detail { font-size: 0.8rem; color: var(--ink2); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* DOC CARD */
+    .doc-card { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .doc-card:last-child { border-bottom: none; }
+    .doc-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent2); display: flex; align-items: center; justify-content: center; font-size: 0.88rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+    .doc-name { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+    .doc-spec { font-size: 0.8rem; color: var(--ink2); margin-top: 1px; }
+    .doc-status { margin-left: auto; }
+
+    /* FORMS */
+    .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .form-field { flex: 1; min-width: 0; }
+    .form-field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--ink2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .form-field input, .form-field select, .form-field textarea { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); font-family: inherit; font-size: 0.9rem; color: var(--ink); outline: none; transition: all 0.2s; resize: vertical; font-weight: 500; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(16,185,129,0.06); }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; justify-content: center; }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 2px 8px rgba(16,185,129,0.15); }
+    .btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-outline { background: transparent; color: var(--ink2); border-color: var(--border); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+    .btn-danger { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn-danger:hover { background: #dc2626; border-color: #dc2626; }
+
+    /* NOTICE */
+    .notice { padding: 14px 18px; border-radius: 12px; font-size: 0.88rem; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 12px; font-weight: 500; line-height: 1.5; }
+    .notice.info    { background: var(--blue2);  color: var(--blue);  border-left: 4px solid var(--blue); }
+    .notice.success { background: var(--accent2); color: var(--accent); border-left: 4px solid var(--accent); }
+    .notice.warn    { background: var(--amber2); color: var(--amber); border-left: 4px solid var(--amber); }
+    .notice.error   { background: var(--red2);   color: var(--red);   border-left: 4px solid var(--red); }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(17,20,23,0.4); display: none; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(4px); padding: 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border-radius: 20px; padding: 32px; width: 520px; max-width: 100%; box-shadow: var(--shadow-lg); animation: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; border: 1px solid var(--border); }
+    .modal-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.5rem; margin-bottom: 24px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; flex-wrap: wrap; }
+
+    /* TOAST */
+    #toast { position: fixed; bottom: 24px; right: 24px; left: 24px; background: #111417; color: #fff; padding: 14px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; box-shadow: var(--shadow-lg); transform: translateY(80px); opacity: 0; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 999; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* CALENDAR GRID */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-day-label { text-align: center; font-size: 0.68rem; font-weight: 700; color: var(--ink3); text-transform: uppercase; padding: 6px 0 10px; letter-spacing: 0.06em; }
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.8rem; cursor: pointer; transition: all 0.15s; position: relative; font-weight: 600; border: 1px solid transparent; }
+    .cal-day:hover { background: var(--surface2); border-color: var(--border); }
+    .cal-day.today { background: var(--accent); color: #fff; font-weight: 700; box-shadow: 0 4px 12px rgba(16,185,129,0.25); }
+    .cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+    .cal-day.today.has-event::after { background: #fff; }
+    .cal-day.other-month { color: var(--ink3); font-weight: 400; }
+    .cal-day.selected { border-color: var(--accent); background: var(--accent2); color: var(--accent); }
+
+    /* TOGGLE SWITCH */
+    .toggle-wrap { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 16px; }
+    .toggle-wrap:last-child { border-bottom: none; }
+    .toggle-label { font-size: 0.9rem; font-weight: 600; color: var(--ink2); }
+    .toggle { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #e9ecef; border-radius: 24px; cursor: pointer; transition: 0.2s; border: 1px solid var(--border); }
+    .toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+    /* CONFIRMATION PAGE */
+    .confirm-card { max-width: 520px; margin: 20px auto; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 32px 20px; box-shadow: var(--shadow-lg); text-align: center; width: 100%; }
+    .confirm-icon { width: 72px; height: 72px; background: var(--accent2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.2rem; color: var(--accent); }
+    .confirm-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 1.6rem; margin-bottom: 28px; color: var(--accent); }
+    .confirm-detail { display: flex; flex-direction: column; gap: 14px; text-align: left; margin-bottom: 32px; background: var(--bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
+    .confirm-row { display: flex; gap: 16px; align-items: baseline; flex-direction: column; }
+    .confirm-key { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink3); min-width: 90px; }
+    .confirm-val { font-size: 0.95rem; color: var(--ink); font-weight: 600; }
+
+    /* PROGRESS BAR */
+    .progress-bar { height: 8px; border-radius: 10px; background: var(--border); overflow: hidden; margin-top: 8px; width: 100%; }
+    .progress-fill { height: 100%; border-radius: 10px; background: var(--accent); }
+
+    /* LOG ITEM */
+    .log-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .log-item:last-child { border-bottom: none; }
+    .log-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink3); flex-shrink: 0; margin-top: 6px; }
+    .log-dot.green { background: var(--accent); }
+    .log-dot.red   { background: var(--red); }
+    .log-dot.amber { background: var(--amber); }
+    .log-text { font-size: 0.9rem; font-weight: 500; line-height: 1.4; color: var(--ink2); }
+    .log-time { font-size: 0.78rem; color: var(--ink3); margin-top: 4px; font-weight: 600; }
+
+    /* CHART BAR (Reports) */
+    .chart-wrap { padding: 24px 0 12px; width: 100%; overflow-x: auto; }
+    .chart-inner { min-width: 450px; position: relative; padding-left: 32px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 180px; padding: 0 8px; border-bottom: 2px solid var(--border); border-left: 2px solid var(--border); margin-bottom: 8px; position: relative; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; justify-content: flex-end; height: 100%; }
+    .bar { width: 100%; background: var(--accent); border-radius: 6px 6px 0 0; transition: all 0.2s; min-width: 24px; box-shadow: 0 2px 6px rgba(16,185,129,0.1); }
+    .bar:hover { background: var(--accent-hover); transform: scaleX(1.05); }
+    .bar-label { font-size: 0.72rem; color: var(--ink2); text-align: center; white-space: nowrap; margin-top: 8px; font-weight: 600; }
+    .bar-val { font-size: 0.78rem; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+    .y-labels { position: absolute; left: -32px; top: 0; height: 100%; display: flex; flex-direction: column-reverse; justify-content: space-between; pointer-events: none; }
+    .y-label { font-size: 0.7rem; color: var(--ink3); font-weight: 600; }
+
+    .mt-4 { margin-top: 16px; }
+    .mt-6 { margin-top: 22px; }
+    .gap-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .full-width { width: 100%; }
+
+    /* RESPONSIVE MEDIA QUERIES */
+    @media (min-width: 480px) {
+      .confirm-row { flex-direction: row; }
+      #toast { left: auto; width: auto; }
+    }
+
+    @media (max-width: 992px) { 
+      .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 16px; } 
+      .stats-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      
+      body:not(.sidebar-hidden) .sidebar { transform: translateX(0); }
+      body.sidebar-hidden .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
+      
+      .sidebar { transform: translateX(calc(-1 * var(--sidebar-width))); }
+      .main-content { margin-left: 0; width: 100%; }
+      .sidebar-toggle { left: 20px; top: 20px; }
+      .page { padding-top: 80px; padding-left: 16px; padding-right: 16px; }
+      .sidebar-close-btn { display: block; }
+    }
+    
+    @media (max-width: 576px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .form-row { flex-direction: column; gap: 16px; }
+      .login-roles { flex-direction: column; }
+      .role-chip .emoji { display: inline-block; margin-bottom: 0; margin-right: 6px; }
+      .role-chip { display: flex; align-items: center; justify-content: center; padding: 12px; }
+      .page-header { flex-direction: column; align-items: stretch; }
+      .page-header .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body class="sidebar-hidden">
+
+<div class="screen active" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">🏥</div>
+      <h1>MEDICLOUD</h1>
+    </div>
+    <p class="login-tagline">Clinic Care Portal — Seamless healthcare management &amp; real-time scheduling.</p>
+    <div class="login-roles" id="role-picker">
+      <div class="role-chip active" data-role="patient"><span class="emoji">🧑‍⚕️</span>Patient</div>
+      <div class="role-chip" data-role="doctor"><span class="emoji">👨‍⚕️</span>Doctor</div>
+      <div class="role-chip" data-role="admin"><span class="emoji">🛡️</span>Admin</div>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@clinic.com" value="patient@clinic.com" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pw" placeholder="••••••••" value="••••••••" />
+    </div>
+    <button class="btn-primary" onclick="doLogin()">Authenticate Credentials</button>
+    <div class="login-footer"><a>Forgot account?</a> <a>Register new account</a></div>
+  </div>
+</div>
+
+<div class="screen" id="app-screen">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="icon">🏥</div>MEDICLOUD</div>
+      <button class="sidebar-close-btn" onclick="toggleSidebar()">✕</button>
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sb-avatar">JD</div>
+        <div>
+          <div class="sidebar-user-name" id="sb-name">John Doe</div>
+          <span class="sidebar-role-badge" id="sb-role">Patient</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-bottom">
+      <div class="logout-btn" onclick="doLogout()"><span>🚪</span> Logout</div>
+    </div>
+  </aside>
+  <main class="main-content" id="main-content">
+    <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">☰</button>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-title" id="modal-title">Modal</div>
+    <div id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── SIDEBAR INTERACTION ──
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-hidden');
+}
+
+// ── STATE ──
+let currentRole = 'patient';
+let currentPage = '';
+let selectedBookingDoctor = null;
+let confirmationData = null;
+
+const ROLES = {
+  patient: {
+    name: 'Juan Dela Cruz', initials: 'JC', label: 'Patient',
+    nav: [
+      { section: 'Main', items: [
+        { id: 'overview',     icon: '🏠', label: 'Dashboard' },
+        { id: 'book',         icon: '📅', label: 'Book Appointment' },
+        { id: 'appointments', icon: '📋', label: 'My Appointments' },
+        { id: 'records',      icon: '📁', label: 'Medical Records' },
+        { id: 'profile',      icon: '👤', label: 'Profile' },
+        { id: 'notification', icon: '🔔', label: 'Notification' },
+      ]}
+    ]
+  },
+  doctor: {
+    name: 'Dr. James Cruz', initials: 'JC', label: 'Doctor',
+    nav: [
+      { section: 'Clinic', items: [
+        { id: 'overview',     icon: '🏠', label: 'Dashboard' },
+        { id: 'dappointments',icon: '📋', label: 'My Appointments' },
+        { id: 'schedule',     icon: '🗓️',  label: 'My Schedule' },
+        { id: 'notification', icon: '🔔', label: 'Notification' },
+        { id: 'profile',      icon: '👤', label: 'Profile' },
+      ]}
+    ]
+  },
+  admin: {
+    name: 'Admin Rivera', initials: 'AR', label: 'Administrator',
+    nav: [
+      { section: 'Management', items: [
+        { id: 'overview',      icon: '🏠', label: 'Dashboard' },
+        { id: 'patientrecords',icon: '🗂️', label: 'Patient Records' },
+        { id: 'aappointments', icon: '📅', label: 'Appointment' },
+        { id: 'reports',       icon: '📊', label: 'Reports' },
+        { id: 'notification',  icon: '🔔', label: 'Notification' },
+        { id: 'settings',      icon: '⚙️', label: 'Settings' },
+      ]}
+    ]
+  }
+};
+
+// ── MOCK DATA ──
+const APPOINTMENTS = [
+  { id: 1, patient: 'Juan Dela Cruz', doctor: 'Dr. Cruz',     date: 'Jun 10, 2026', time: '09:00 AM', type: 'General Check-up',    status: 'confirmed' },
+  { id: 2, patient: 'Juan Dela Cruz', doctor: 'Dr. Reyes',    date: 'Jun 15, 2026', time: '11:30 AM', type: 'Cardiology Follow-up', status: 'pending' },
+  { id: 3, patient: 'Juan Dela Cruz', doctor: 'Dr. Lim',      date: 'May 28, 2026', time: '02:00 PM', type: 'Blood Test Review',    status: 'completed' },
+  { id: 4, patient: 'Maria Santos',   doctor: 'Dr. Cruz',     date: 'Jun 10, 2026', time: '10:00 AM', type: 'Hypertension Check',   status: 'confirmed' },
+  { id: 5, patient: 'Ana Reyes',      doctor: 'Dr. Cruz',     date: 'Jun 11, 2026', time: '09:30 AM', type: 'Prenatal Visit',       status: 'confirmed' },
+  { id: 6, patient: 'Carlos Tan',     doctor: 'Dr. Lim',      date: 'Jun 11, 2026', time: '03:00 PM', type: 'Diabetes Follow-up',   status: 'pending' },
+];
+
+const DOCTORS = [
+  { name: 'Dr. James Cruz',  spec: 'Internal Medicine',  status: 'available', slots: 3 },
+  { name: 'Dr. Sofia Reyes', spec: 'Cardiology',         status: 'busy',      slots: 0 },
+  { name: 'Dr. Ken Lim',     spec: 'Endocrinology',      status: 'available', slots: 5 },
+  { name: 'Dr. Mae Santos',  spec: 'OB-Gynecology',      status: 'off-duty',  slots: 0 },
+];
+
+const RECORDS = [
+  { date: 'May 28, 2026', type: 'Blood Test',  doctor: 'Dr. Lim',   result: 'Normal' },
+  { date: 'Apr 12, 2026', type: 'ECG Report',  doctor: 'Dr. Reyes', result: 'Reviewed' },
+  { date: 'Mar 5, 2026',  type: 'X-Ray Chest', doctor: 'Dr. Cruz',  result: 'Clear' },
+  { date: 'Jan 19, 2026', type: 'Urinalysis',  doctor: 'Dr. Lim',   result: 'Normal' },
+];
+
+const ALL_PATIENTS = [
+  { id: 'P001', name: 'Juan Dela Cruz', contact: '+63 912 345 6789', status: 'active' },
+  { id: 'P002', name: 'Maria Santos',   contact: '+63 917 234 5678', status: 'active' },
+  { id: 'P003', name: 'Ana Reyes',      contact: '+63 920 111 2233', status: 'inactive' },
+  { id: 'P004', name: 'Carlos Tan',     contact: '+63 935 444 5566', status: 'active' },
+  { id: 'P005', name: 'Rosa Garcia',    contact: '+63 918 777 8899', status: 'active' },
+];
+
+const LOGS = [
+  { time: '10:42 AM', text: 'Patient Juan Dela Cruz checked in — Slot A3', color: 'green' },
+  { time: '10:18 AM', text: 'Dr. Reyes marked unavailable for afternoon slots', color: 'amber' },
+  { time: '09:55 AM', text: 'Appointment #004 cancelled by patient', color: 'red' },
+  { time: '09:30 AM', text: 'System: Daily log auto-generated', color: '' },
+  { time: '09:15 AM', text: 'New patient registered: Carlos Tan', color: 'green' },
+  { time: '08:50 AM', text: 'Dr. Cruz availability set: Mon–Fri 8AM–12PM', color: 'green' },
+];
+
+const BOOKING_REPORT = [
+  { label: 'May 1-5',   val: 42 },
+  { label: 'May 6-10',  val: 18 },
+  { label: 'May 11-15', val: 35 },
+  { label: 'May 16-20', val: 28 },
+  { label: 'May 21-25', val: 45 },
+  { label: 'May 26-31', val: 32 },
+];
+
+// ── LOGIN ──
+document.querySelectorAll('.role-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.role-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentRole = chip.dataset.role;
+    const emails = { patient: 'patient@clinic.com', doctor: 'doctor@clinic.com', admin: 'admin@clinic.com' };
+    document.getElementById('login-email').value = emails[currentRole];
+  });
+});
+
+function doLogin() {
+  switchScreen('app');
+  buildSidebar();
+  navigateTo(ROLES[currentRole].nav[0].items[0].id);
+}
+function doLogout() { switchScreen('login'); }
+function switchScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name + '-screen').classList.add('active');
+}
+
+// ── SIDEBAR ──
+function buildSidebar() {
+  const r = ROLES[currentRole];
+  document.getElementById('sb-avatar').textContent = r.initials;
+  document.getElementById('sb-name').textContent = r.name;
+  document.getElementById('sb-role').textContent = r.label;
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = '';
+  r.nav.forEach(section => {
+    nav.innerHTML += `<div class="nav-section-label">${section.section}</div>`;
+    section.items.forEach(item => {
+      nav.innerHTML += `<div class="nav-item" data-page="${item.id}" onclick="navigateTo('${item.id}')">
+        <span class="nav-icon">${item.icon}</span>${item.label}</div>`;
+    });
+  });
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const target = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (target) target.classList.add('active');
+  const main = document.getElementById('main-content');
+  
+  // Close sidebar automatically on mobile routing updates
+  if (window.innerWidth <= 992) {
+    document.body.classList.add('sidebar-hidden');
+  }
+  
+  // Keep the toggle button intact inside main content
+  const existingToggle = document.getElementById('sidebar-toggle');
+  main.innerHTML = '';
+  if (existingToggle) main.appendChild(existingToggle);
+  
+  const pageEl = document.createElement('div');
+  pageEl.className = 'page active';
+  const map = {
+    overview: { patient: buildPatientOverview, doctor: buildDoctorOverview, admin: buildAdminOverview },
+  };
+  const builders = {
+    book: buildPatientBook, appointments: buildPatientAppointments,
+    records: buildPatientRecords, profile: buildProfile, notification: buildNotification,
+    dappointments: buildDoctorAppointments, schedule: buildDoctorSchedule,
+    patientrecords: buildAdminPatientRecords, aappointments: buildAdminAppointments,
+    reports: buildAdminReports, settings: buildAdminSettings,
+    confirmation: buildConfirmation,
+  };
+  if (page === 'overview') {
+    map.overview[currentRole](pageEl);
+  } else if (builders[page]) {
+    builders[page](pageEl);
+  }
+  main.appendChild(pageEl);
+}
+
+// ══════════════════════════════════════════
+// PATIENT PAGES
+// ══════════════════════════════════════════
+function buildPatientOverview(el) {
+  const r = ROLES[currentRole];
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Patient Dashboard</div>
+        <div class="page-subtitle">Welcome back, ${r.name} — Tuesday, June 2, 2026</div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-bottom:20px">
+      <div class="card" style="cursor:pointer" onclick="navigateTo('appointments')">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:48px;height:48px;background:var(--accent2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🗓️</div>
+          <div>
+            <div style="font-weight:600;font-size:0.95rem">View Schedule</div>
+            <div style="font-size:0.78rem;color:var(--ink3);margin-top:2px">Next: Jun 10 at 9:00 AM with Dr. Cruz</div>
+          </div>
+        </div>
+        <div class="schedule-list" style="margin-top:16px">
+          ${APPOINTMENTS.filter(a => a.patient === r.name && a.status !== 'completed').slice(0,2).map(a => `
+            <div class="schedule-item">
+              <div class="schedule-time">${a.time.split(' ')[0]}</div>
+              <div class="schedule-dot ${a.status === 'pending' ? 'amber' : ''}"></div>
+              <div class="schedule-info">
+                <div class="schedule-name">${a.type}</div>
+                <div class="schedule-detail">${a.doctor} · ${a.date}</div>
+              </div>
+              <span class="badge ${a.status === 'confirmed' ? 'green' : 'amber'}">${a.status}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px">
+          <div style="font-weight:600;font-size:0.95rem">My Appointments</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-accent" onclick="navigateTo('book')" title="Book new appointment">＋ Book</button>
+          </div>
+        </div>
+        ${APPOINTMENTS.filter(a => a.patient === r.name).map(a => `
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:0.84rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.type}</div>
+              <div style="font-size:0.73rem;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.doctor} · ${a.date} ${a.time}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              <span class="badge ${a.status === 'confirmed' ? 'green' : a.status === 'completed' ? 'blue' : 'amber'}">${a.status}</span>
+              ${a.status !== 'completed' ? `<button class="btn btn-sm btn-danger" onclick="showToast('❌ Appointment cancelled')">✕</button>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Available Doctors <span onclick="navigateTo('book')">Book →</span></div>
+      <div class="grid-2">
+        ${DOCTORS.map(d => `
+          <div class="doc-card">
+            <div class="doc-avatar">${d.name.split(' ').slice(-1)[0].substring(0,2).toUpperCase()}</div>
+            <div style="min-width:0;flex:1">
+              <div class="doc-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.name}</div>
+              <div class="doc-spec" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${d.spec}</div>
+            </div>
+            <span class="badge ${d.status === 'available' ? 'green' : d.status === 'busy' ? 'amber' : 'gray'}">${d.status}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function buildPatientBook(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Book Appointment</div>
+        <div class="page-subtitle">Schedule a visit with an available doctor</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Select Doctor &amp; Details</div>
+        <div class="form-field" style="margin-bottom:12px">
+          <label>Search Doctor's Name</label>
+          <div class="search-bar">
+            <input type="text" id="doctor-search" placeholder="Search doctors..." oninput="filterDoctors()" />
+            <button onclick="filterDoctors()">Search</button>
+          </div>
+        </div>
+        <div id="doctor-list" style="margin-bottom:14px">
+          ${DOCTORS.map((d, i) => `
+            <div class="schedule-item" id="doc-item-${i}" onclick="selectDoctor(${i})" style="cursor:pointer;margin-bottom:6px">
+              <div class="schedule-info">
+                <div class="schedule-name">${d.name}</div>
+                <div class="schedule-detail">${d.spec}</div>
+              </div>
+              <span class="badge ${d.status === 'available' ? 'green' : d.status === 'busy' ? 'amber' : 'gray'}">${d.status}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div id="doctor-info" style="display:none;background:var(--accent2);border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid #b2d8cf">
+          <div id="doctor-info-content"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Select Date</label>
+            <input type="date" id="book-date" value="2026-06-10" />
+          </div>
+          <div class="form-field">
+            <label>Select Time</label>
+            <select id="book-time">
+              <option>09:00 AM</option><option>09:30 AM</option>
+              <option>10:00 AM</option><option>11:00 AM</option>
+              <option>01:00 PM</option><option>02:00 PM</option><option>03:00 PM</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px">
+          <label>Appointment Type</label>
+          <select id="book-type">
+            <option>General Check-up</option>
+            <option>Follow-up Consultation</option>
+            <option>Lab Results Review</option>
+            <option>Prescription Refill</option>
+            <option>Prenatal Visit</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin-bottom:18px">
+          <label>Notes / Complaints</label>
+          <textarea rows="3" placeholder="Describe your symptoms or reason for visit..."></textarea>
+        </div>
+        <button class="btn btn-accent full-width" onclick="submitBooking()">📅 Submit &amp; Confirm Booking</button>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
+          <div style="font-weight:600;font-size:0.9rem">June 2026</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm btn-outline">‹</button>
+            <button class="btn btn-sm btn-outline">›</button>
+          </div>
+        </div>
+        <div class="cal-grid">
+          ${['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d=>`<div class="cal-day-label">${d}</div>`).join('')}
+          ${[...Array(6)].map((_,i)=>`<div class="cal-day other-month">${26+i}</div>`).join('')}
+          ${[...Array(30)].map((_,i)=>{const d=i+1;const cls=d===2?'today':[10,11,15,18,22].includes(d)?'has-event':'';return `<div class="cal-day ${cls}" onclick="selectCalDay(this,${d})">${d}</div>`;}).join('')}
+        </div>
+        <div class="mt-4">
+          <div class="notice info">ℹ️ <span>Highlighted days have available slots. Click a date to select it.</span></div>
+        </div>
+        <div class="mt-4">
+          <div style="font-size:0.8rem;font-weight:600;margin-bottom:8px;color:var(--ink2)">DISPLAY AVAILABILITY</div>
+          ${DOCTORS.map(d=>`
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem">
+              <span>${d.name}</span>
+              <span class="badge ${d.status==='available'?'green':d.status==='busy'?'amber':'gray'}">${d.slots} slots</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function selectCalDay(el, d) {
+  document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const dateInput = document.getElementById('book-date');
+  if (dateInput) dateInput.value = `2026-06-${String(d).padStart(2,'0')}`;
+}
+
+function filterDoctors() {
+  const q = (document.getElementById('doctor-search')?.value || '').toLowerCase();
+  DOCTORS.forEach((d, i) => {
+    const item = document.getElementById(`doc-item-${i}`);
+    if (item) item.style.display = (d.name.toLowerCase().includes(q) || d.spec.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+
+function selectDoctor(i) {
+  document.querySelectorAll('[id^="doc-item-"]').forEach(el => el.style.outline = '');
+  const item = document.getElementById(`doc-item-${i}`);
+  if (item) item.style.outline = '2px solid var(--accent)';
+  selectedBookingDoctor = DOCTORS[i];
+  const infoEl = document.getElementById('doctor-info');
+  const contentEl = document.getElementById('doctor-info-content');
+  if (infoEl && contentEl) {
+    infoEl.style.display = '';
+    contentEl.innerHTML = `
+      <div style="font-weight:600;font-size:0.88rem;margin-bottom:4px">${selectedBookingDoctor.name}</div>
+      <div style="font-size:0.8rem;color:var(--ink2)">Specialization: <strong>${selectedBookingDoctor.spec}</strong></div>
+      <div style="font-size:0.8rem;margin-top:4px">Status: <span class="badge ${selectedBookingDoctor.status==='available'?'green':selectedBookingDoctor.status==='busy'?'amber':'gray'}">${selectedBookingDoctor.status}</span> · ${selectedBookingDoctor.slots} open slots today</div>`;
+  }
+}
+
+function submitBooking() {
+  const date = document.getElementById('book-date')?.value || '2026-06-10';
+  const time = document.getElementById('book-time')?.value || '09:00 AM';
+  const type = document.getElementById('book-type')?.value || 'General Check-up';
+  const doc = selectedBookingDoctor || DOCTORS[0];
+  const parts = date.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr = `${months[parseInt(parts[1])-1]} ${parseInt(parts[2])}, ${parts[0]}`;
+  confirmationData = { doctor: doc.name, spec: doc.spec, date: dateStr, time, type, location: 'Room 102, 1F Clinic Wing', status: 'Confirmed' };
+  navigateTo('confirmation');
+}
+
+function buildConfirmation(el) {
+  const d = confirmationData || { doctor: 'Dr. James Cruz', spec: 'Internal Medicine', date: 'Jun 10, 2026', time: '09:00 AM', type: 'General Check-up', location: 'Room 102, 1F Clinic Wing', status: 'Confirmed' };
+  el.innerHTML = `
+    <div class="confirm-card">
+      <div class="confirm-icon">✅</div>
+      <div class="confirm-title">Appointment Confirmed!</div>
+      <div class="confirm-detail">
+        <div class="confirm-row"><span class="confirm-key">Doctor:</span><span class="confirm-val">${d.doctor} <span style="color:var(--ink3);font-size:0.8rem">(${d.spec})</span></span></div>
+        <div class="confirm-row"><span class="confirm-key">Date:</span><span class="confirm-val">${d.date}</span></div>
+        <div class="confirm-row"><span class="confirm-key">Time:</span><span class="confirm-val">${d.time}</span></div>
+        <div class="confirm-row"><span class="confirm-key">Location:</span><span class="confirm-val">${d.location}</span></div>
+        <div class="confirm-row"><span class="confirm-key">Status:</span><span class="confirm-val"><span class="badge green">${d.status}</span></span></div>
+      </div>
+      <button class="btn btn-accent full-width" onclick="navigateTo('overview')">← Back to Dashboard</button>
+    </div>`;
+}
+
+function buildPatientAppointments(el) {
+  const r = ROLES[currentRole];
+  const mine = APPOINTMENTS.filter(a => a.patient === r.name);
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">My Appointments</div>
+        <div class="page-subtitle">${mine.length} total appointments on record</div>
+      </div>
+      <button class="btn btn-accent" onclick="navigateTo('book')">＋ New Booking</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Time</th><th>Doctor</th><th>Type</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${mine.map(a => `<tr>
+              <td>${a.date}</td><td>${a.time}</td><td>${a.doctor}</td><td>${a.type}</td>
+              <td><span class="badge ${a.status==='confirmed'?'green':a.status==='completed'?'blue':'amber'}">${a.status}</span></td>
+              <td><div class="gap-actions">
+                ${a.status !== 'completed' ? `
+                  <button class="btn btn-sm btn-outline" onclick="showToast('🔄 Reschedule flow...')">Reschedule</button>
+                  <button class="btn btn-sm btn-danger" onclick="showToast('❌ Appointment cancelled')">Cancel</button>` :
+                  '<span style="color:var(--ink3);font-size:0.78rem">—</span>'}
+              </div></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function buildPatientRecords(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Medical Records</div><div class="page-subtitle">Your health documents and lab results</div></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Record Type</th><th>Attending Doctor</th><th>Result/Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${RECORDS.map(r=>`<tr>
+              <td>${r.date}</td><td>${r.type}</td><td>${r.doctor}</td>
+              <td><span class="badge green">${r.result}</span></td>
+              <td><button class="btn btn-sm btn-outline" onclick="showToast('📄 Opening record...')">View</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ── BLENDING REST OF ROUTING LOGIC & VIEW GENERATORS ──
+function buildNotification(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Notifications</div><div class="page-subtitle">Recent updates and alerts</div></div>
+    </div>
+    <div class="card">
+      ${[
+        { icon: '✅', text: 'Your appointment with Dr. Cruz on Jun 10 is confirmed.', time: '2 hours ago', color: 'green' },
+        { icon: '⏰', text: 'Reminder: Blood test review tomorrow at 2:00 PM with Dr. Lim.', time: '5 hours ago', color: 'amber' },
+        { icon: '📋', text: 'New medical record available: ECG Report from Dr. Reyes.', time: '2 days ago', color: 'blue' },
+        { icon: '💊', text: 'Prescription renewal due: Losartan — visit soon.', time: '3 days ago', color: 'red' },
+      ].map(n => `
+        <div class="log-item">
+          <div class="log-dot ${n.color}"></div>
+          <div>
+            <div class="log-text">${n.icon} ${n.text}</div>
+            <div class="log-time">${n.time}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function buildProfile(el) {
+  const r = ROLES[currentRole];
+  el.innerHTML = `
+    <div class="page-header"><div><div class="page-title">My Profile</div><div class="page-subtitle">Manage your account information</div></div></div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="text-align:center;padding:14px 0 22px">
+          <div style="width:68px;height:68px;border-radius:50%;background:var(--accent2);display:inline-flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:var(--accent);margin-bottom:10px">${r.initials}</div>
+          <div style="font-weight:600;font-size:1rem">${r.name}</div>
+          <span class="badge ${currentRole==='admin'?'red':currentRole==='doctor'?'blue':'green'}" style="margin-top:6px">${r.label}</span>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>First Name</label><input type="text" value="${r.name.split(' ')[0]}" /></div>
+          <div class="form-field"><label>Last Name</label><input type="text" value="${r.name.split(' ').slice(-1)[0]}" /></div>
+        </div>
+        <div class="form-field" style="margin-bottom:12px"><label>Email</label><input type="email" value="${currentRole}@clinic.com" /></div>
+        <div class="form-field" style="margin-bottom:16px"><label>Phone</label><input type="text" value="+63 912 345 6789" /></div>
+        <button class="btn btn-accent" onclick="showToast('✅ Profile updated!')">Save Changes</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Change Password</div>
+        <div class="form-field" style="margin-bottom:12px"><label>Current Password</label><input type="password" placeholder="••••••••" /></div>
+        <div class="form-field" style="margin-bottom:12px"><label>New Password</label><input type="password" placeholder="••••••••" /></div>
+        <div class="form-field" style="margin-bottom:16px"><label>Confirm New Password</label><input type="password" placeholder="••••••••" /></div>
+        <button class="btn btn-outline" onclick="showToast('🔒 Password updated!')">Update Password</button>
+      </div>
+    </div>`;
+}
+
+function buildDoctorOverview(el) {
+  const mine = APPOINTMENTS.filter(a => a.doctor === 'Dr. Cruz');
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Doctor Dashboard</div>
+        <div class="page-subtitle">Welcome, Dr. Cruz 🩺 — Tuesday, June 2, 2026</div>
+      </div>
+      <button class="btn btn-accent" onclick="navigateTo('schedule')">⏰ Update Availability</button>
+    </div>
+    <div class="search-bar" style="margin-bottom:20px">
+      <input type="text" placeholder="Search patient name..." />
+      <button>Search</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="stat-icon">👥</div><div class="stat-label">Today's Patients</div><div class="stat-value">3</div><div class="stat-sub">2 confirmed, 1 pending</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📅</div><div class="stat-label">This Week</div><div class="stat-value">11</div><div class="stat-sub">Appointments booked</div></div>
+      <div class="stat-card amber"><div class="stat-icon">⏰</div><div class="stat-label">Available Slots</div><div class="stat-value">3</div><div class="stat-sub">Remaining today</div></div>
+      <div class="stat-card red"><div class="stat-icon">🩹</div><div class="stat-label">Pending Reviews</div><div class="stat-value">2</div><div class="stat-sub">Lab results to sign</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Today's Appointments <span onclick="navigateTo('dappointments')">View all →</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Name of Patient</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${mine.map(a => `<tr>
+              <td style="color:var(--accent);font-weight:600">${a.time}</td>
+              <td>${a.patient}</td>
+              <td>${a.type}</td>
+              <td><span class="badge ${a.status==='confirmed'?'green':a.status==='completed'?'blue':'amber'}">${a.status}</span></td>
+              <td><button class="btn btn-sm btn-outline" onclick="showToast('📋 Patient details...')">View</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-title">Patient Flow — Stats</div>
+      ${[
+        { name:'Juan Dela Cruz', progress:75, label:'Check-up in progress' },
+        { name:'Maria Santos',   progress:30, label:'Waiting room' },
+        { name:'Ana Reyes',      progress:0,  label:'Not yet arrived' },
+      ].map(p=>`
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:0.83rem;gap:10px">
+            <span style="font-weight:500">${p.name}</span>
+            <span style="color:var(--ink3);font-size:0.75rem;text-align:right">${p.label}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%"></div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function buildDoctorAppointments(el) {
+  const mine = APPOINTMENTS.filter(a => a.doctor === 'Dr. Cruz');
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">My Appointments</div><div class="page-subtitle">All scheduled patient visits</div></div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Patient</th><th>Date</th><th>Time</th><th>Type</th><th>Status</th></tr></thead>
+          <tbody>
+            ${mine.map(a=>`<tr>
+              <td>${a.patient}</td><td>${a.date}</td><td>${a.time}</td><td>${a.type}</td>
+              <td><span class="badge ${a.status==='confirmed'?'green':a.status==='completed'?'blue':'amber'}">${a.status}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function buildDoctorSchedule(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Manage Schedule</div><div class="page-subtitle">Configure your available time slots</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+          <div style="font-weight:600;font-size:0.9rem">June 2026</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn btn-sm btn-outline">‹</button>
+            <button class="btn btn-sm btn-outline">›</button>
+            <span class="badge green" style="margin-left:6px">Display Availability</span>
+          </div>
+        </div>
+        <div class="cal-grid">
+          ${['SUN','MON','TUE','WED','THU','FRI','SAT'].map(d=>`<div class="cal-day-label">${d}</div>`).join('')}
+          ${[...Array(6)].map((_,i)=>`<div class="cal-day other-month">${26+i}</div>`).join('')}
+          ${[...Array(30)].map((_,i)=>{
+            const d=i+1;
+            const avail=[2,3,4,5,6,9,10,11,12,13,16,17,18,19,23,24,25,26];
+            const cls = d===2?'today has-event': avail.includes(d)?'has-event':'';
+            return `<div class="cal-day ${cls}" title="${avail.includes(d)||d===2?'Available':''}">${d}</div>`;
+          }).join('')}
+        </div>
+        <div style="font-size:0.72rem;color:var(--ink3);margin-top:10px">Click the date to mark you are available</div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px">
+          <div style="font-weight:600;font-size:0.9rem">Available Time Slots</div>
+          <span style="font-size:0.78rem;color:var(--ink3);text-align:right">Turn on/off to set available time</span>
+        </div>
+        ${[
+          { time: '9:00 AM',  on: true },
+          { time: '10:00 AM', on: false },
+          { time: '11:00 AM', on: true },
+          { time: '1:00 PM',  on: false },
+          { time: '2:00 PM',  on: false },
+        ].map((slot, i) => `
+          <div class="toggle-wrap">
+            <span class="toggle-label">${slot.time}</span>
+            <label class="toggle">
+              <input type="checkbox" ${slot.on ? 'checked' : ''}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        `).join('')}
+        <button class="btn btn-accent full-width mt-4" onclick="showToast('✅ Schedule saved!')">Save Changes</button>
+      </div>
+    </div>`;
+}
+
+function buildAdminOverview(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Admin Dashboard</div><div class="page-subtitle">🛡️ Tuesday, June 2, 2026 — System overview</div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card green"><div class="stat-icon">👥</div><div class="stat-label">Total Patient</div><div class="stat-value">5</div><div class="stat-sub">Registered patients</div></div>
+      <div class="stat-card blue"><div class="stat-icon">📅</div><div class="stat-label">Appointments</div><div class="stat-value">6</div><div class="stat-sub">All time</div></div>
+      <div class="stat-card amber"><div class="stat-icon">🕐</div><div class="stat-label">Today's Appointment</div><div class="stat-value">3</div><div class="stat-sub">Confirmed today</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Recent Appointments</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th>Status</th><th>Date</th><th>Name of Patient</th><th>Doctor</th></tr></thead>
+          <tbody>
+            ${APPOINTMENTS.map(a=>`<tr>
+              <td style="color:var(--accent);font-weight:600">${a.time}</td>
+              <td><span class="badge ${a.status==='confirmed'?'green':a.status==='completed'?'blue':'amber'}">${a.status}</span></td>
+              <td>${a.date}</td>
+              <td>${a.patient}</td>
+              <td>${a.doctor}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-title">Live Activity Log <span onclick="showToast('📜 Full log...')">Full log →</span></div>
+      ${LOGS.slice(0,4).map(l=>`
+        <div class="log-item">
+          <div class="log-dot ${l.color}"></div>
+          <div><div class="log-text">${l.text}</div><div class="log-time">${l.time}</div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function buildAdminPatientRecords(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Patient Records</div><div class="page-subtitle">Manage all registered patients</div></div>
+      <button class="btn btn-accent" onclick="showToast('👤 Add patient form...')">＋ Add New Patient</button>
+    </div>
+    <div class="card">
+      <div class="search-bar" style="margin-bottom:16px">
+        <input type="text" placeholder="Search patient name..." id="pt-search" oninput="filterPatients()" />
+        <button onclick="filterPatients()">Search</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Contact</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="patient-table-body">
+            ${ALL_PATIENTS.map(p=>`<tr>
+              <td style="font-family:monospace;color:var(--ink3)">${p.id}</td>
+              <td>${p.name}</td>
+              <td style="color:var(--ink2)">${p.contact}</td>
+              <td><span class="badge ${p.status==='active'?'green':'gray'}">${p.status}</span></td>
+              <td><div class="gap-actions">
+                <button class="btn btn-sm btn-outline" onclick="showToast('👁️ Viewing patient...')">View</button>
+                <button class="btn btn-sm btn-danger" onclick="showToast('🗑️ Record removed')">Remove</button>
+              </div></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function filterPatients() {
+  const q = (document.getElementById('pt-search')?.value || '').toLowerCase();
+  const rows = document.querySelectorAll('#patient-table-body tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function buildAdminAppointments(el) {
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Appointment</div><div class="page-subtitle">All clinic appointments</div></div>
+      <button class="btn btn-accent" onclick="showToast('📅 New appointment...')">＋ Add Appointment</button>
+    </div>
+    <div class="card">
+      <div class="search-bar" style="margin-bottom:16px">
+        <input type="text" placeholder="Search by patient or doctor..." />
+        <button>Search</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${APPOINTMENTS.map(a=>`<tr>
+              <td style="font-family:monospace;color:var(--ink3)">#${a.id}</td>
+              <td>${a.patient}</td>
+              <td>${a.doctor}</td>
+              <td>${a.date}</td>
+              <td>${a.time}</td>
+              <td>${a.type}</td>
+              <td><span class="badge ${a.status==='confirmed'?'green':a.status==='completed'?'blue':'amber'}">${a.status}</span></td>
+              <td><div class="gap-actions">
+                <button class="btn btn-sm btn-outline" onclick="showToast('✏️ Edit appointment')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="showToast('❌ Cancelled')">Cancel</button>
+              </div></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function buildAdminReports(el) {
+  const maxVal = Math.max(...BOOKING_REPORT.map(b => b.val));
+  el.innerHTML = `
+    <div class="page-header">
+      <div><div class="page-title">Reports</div><div class="page-subtitle">Analytics and booking data</div></div>
+      <button class="btn btn-outline" onclick="showToast('📥 Report exported!')">Export CSV</button>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Filter Reports</div>
+        <div class="form-field" style="margin-bottom:12px">
+          <label>Item / Report Type</label>
+          <select>
+            <option>Booking Report</option>
+            <option>Patient Report</option>
+            <option>Doctor Availability</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin-bottom:12px">
+          <label>Date From</label>
+          <input type="date" value="2026-05-01" />
+        </div>
+        <div class="form-field" style="margin-bottom:12px">
+          <label>Date To</label>
+          <input type="date" value="2026-05-31" />
+        </div>
+        <div class="form-field" style="margin-bottom:18px">
+          <label>Doctor</label>
+          <select>
+            <option>All Doctors</option>
+            ${DOCTORS.map(d=>`<option>${d.name}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-accent full-width" onclick="showToast('📊 Report generated!')">Generate Reports</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Booking Report</div>
+        <div class="chart-wrap">
+          <div class="chart-inner">
+            <div class="y-labels">
+              ${[0,10,20,30,40,50].map(v=>`<div class="y-label">${v}</div>`).join('')}
+            </div>
+            <div class="bar-chart">
+              ${BOOKING_REPORT.map(b => `
+                <div class="bar-col">
+                  <div class="bar-val">${b.val}</div>
+                  <div class="bar" style="height:${(b.val/maxVal)*100}%"></div>
+                </div>
+              `).join('')}
+            </div>
+            <div style="display:flex;gap:8px;padding:0 0 0 0;margin-top:4px">
+              ${BOOKING_REPORT.map(b=>`<div class="bar-label" style="flex:1">${b.label}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="notice info mt-4">ℹ️ <span>Showing booking data for May 2026. Use filters to adjust range.</span></div>
+      </div>
+    </div>`;
+}
+
+function buildAdminSettings(el) {
+  el.innerHTML = `
+    <div class="page-header"><div><div class="page-title">Settings</div><div class="page-subtitle">System configuration</div></div></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">General Settings</div>
+        <div class="form-field" style="margin-bottom:12px"><label>Clinic Name</label><input type="text" value="MEDICLOUD Clinic" /></div>
+        <div class="form-field" style="margin-bottom:12px"><label>Address</label><input type="text" value="123 Health St., Quezon City" /></div>
+        <div class="form-field" style="margin-bottom:12px"><label>Contact</label><input type="text" value="+63 2 8888 0000" /></div>
+        <div class="form-field" style="margin-bottom:16px"><label>Operating Hours</label><input type="text" value="Mon–Fri, 8:00 AM – 5:00 PM" /></div>
+        <button class="btn btn-accent" onclick="showToast('✅ Settings saved!')">Save Settings</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Notification Preferences</div>
+        ${[
+          'Email notifications for new appointments',
+          'SMS reminders to patients (24h before)',
+          'Doctor availability alerts',
+          'Admin override audit logs',
+        ].map((item, i) => `
+          <div class="toggle-wrap">
+            <span class="toggle-label" style="font-size:0.82rem">${item}</span>
+            <label class="toggle"><input type="checkbox" ${i < 3 ? 'checked' : ''}><span class="toggle-slider"></span></label>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+</script>
+</body>
+</html>
